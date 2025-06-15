@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Disorder Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        /* Custom scrollbar for better aesthetics, matching the dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2D3748;
+            /* bg-gray-800 */
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4A5568;
+            /* bg-gray-600 */
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280;
+            /* bg-gray-500 */
+        }
+
+        /* Specific styles for the input boxes to match the reference image */
+        .input-field {
+            background-color: #f2f3f5;
+            /* bg-gray-800 */
+            color: black;
+            /* text-gray-200 */
+            padding: 0.75rem 1rem;
+            /* p-3 p-4 */
+            border-radius: 0.5rem;
+            /* rounded-lg */
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #4299E1;
+            /* blue-500 */
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+            /* ring-blue-300 */
+        }
+
+        /* Custom select arrow */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8em;
+            color: #CBD5E0;
+            /* text-gray-400 */
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .select-field {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 2.5rem;
+            /* Make space for the custom arrow */
+        }
+
+        .sidebar-icon {
+            @apply flex items-center justify-center w-12 h-12 rounded-lg transition-colors duration-200;
+        }
+
+        .sidebar-icon:hover {
+            @apply bg-blue-700;
+        }
+
+        .sidebar-icon.active {
+            @apply bg-blue-600;
+        }
+
+        .sidebar-icon.active svg {
+            fill: white !important;
+            /* Added !important */
+        }
+
+        /* Dark Mode Styles */
+        body.dark {
+            background-color: #1a202c;
+            /* Tailwind's gray-900 */
+            color: #e2e8f0;
+            /* Tailwind's gray-200 */
+        }
+
+        body.dark .bg-gray-100 {
+            background-color: #1a202c;
+        }
+
+        body.dark .bg-white {
+            background-color: #2d3748;
+            /* Tailwind's gray-800 */
+            /* Removed border-color */
+        }
+
+        body.dark .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark .text-gray-900 {
+            color: #e2e8f0;
+        }
+
+        body.dark .text-gray-800 {
+            color: #e2e8f0;
+        }
+
+        body.dark .text-gray-700 {
+            color: #cbd5e0;
+            /* Tailwind's gray-300 */
+        }
+
+        body.dark .text-gray-600 {
+            color: #a0aec0;
+            /* Tailwind's gray-400 */
+        }
+
+        body.dark .text-gray-500 {
+            color: #718096;
+            /* Tailwind's gray-500 */
+        }
+
+
+        body.dark .input-field {
+            background-color: #4a5568;
+            /* Tailwind's gray-600 */
+            color: #e2e8f0;
+        }
+
+        body.dark .input-field::placeholder {
+            color: #cbd5e0;
+        }
+
+        body.dark .bg-gray-50 {
+            background-color: #2d3748;
+        }
+
+        body.dark .bg-blue-600 {
+            background-color: #3182ce;
+            /* A slightly lighter blue for dark mode */
+        }
+
+        .bg-blue-600 {
+            background-color: #2c5282 !important;
+        }
+
+        body.dark .bg-blue-700:hover {
+            background-color: #2b6cb0;
+        }
+
+        body.dark .active.bg-blue-600 {
+            background-color: #2c5282;
+        }
+
+        /* SVG fill color for dark mode */
+        body.dark svg {
+            fill: #e2e8f0 !important;
+            /* Forces SVG fill to white in dark mode */
+        }
+
+        /* Dark mode toggle animation */
+        #darkModeToggle svg {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        body.dark #darkModeToggle .sun-icon {
+            display: none;
+        }
+
+        body:not(.dark) #darkModeToggle .moon-icon {
+            display: none;
+        }
+
+        /* Style for the article link container */
+        .article-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            /* To push the arrow to the right */
+            cursor: pointer;
+            padding: 0.75rem;
+            /* p-3 */
+            background-color: #f9fafb;
+            /* bg-gray-50 */
+            border-radius: 0.5rem;
+            /* rounded-lg */
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .article-link:hover {
+            background-color: #f3f4f6;
+            /* A slightly darker gray on hover */
+        }
+
+        body.dark .article-link {
+            background-color: #3b475c;
+            /* Dark mode background for article card */
+        }
+
+        body.dark .article-link:hover {
+            background-color: #4a5568;
+            /* Darker hover for dark mode */
+        }
+
+        .sidebar-icon.active {
+            background-color: #2c5282 !important;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans antialiased text-gray-900">
+
+    <div class="flex h-screen bg-gray-100">
+        <aside class="w-20 bg-white shadow-lg flex flex-col items-center py-6 z-10">
+            <div class="mb-10" data-aos="fade-down">
+                <span class="font-bold text-2xl text-blue-600">I</span>
+            </div>
+            <nav class="flex flex-col gap-5">
+                <a href="index.html"
+                    class="shadow-lg p-3 active rounded-full sidebar-icon text-gray-600 hover:text-blue-400"
+                    data-aos="fade-right" data-aos-delay="100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                        <path
+                            d="M19.649 5.286 14 8.548V2.025h-4v6.523L4.351 5.286l-2 3.465 5.648 3.261-5.648 3.261 2 3.465L10 15.477V22h4v-6.523l5.649 3.261 2-3.465-5.648-3.261 5.648-3.261z">
+                        </path>
+                    </svg>
+                </a>
+                <a href="team.html" class="shadow-lg p-3 rounded-full sidebar-icon text-gray-600 hover:text-blue-400"
+                    data-aos="fade-right" data-aos-delay="200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                        <path
+                            d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z">
+                        </path>
+                        <path d="M11 11h2v6h-2zm0-4h2v2h-2z"></path>
+                    </svg>
+                </a>
+            </nav>
+
+        </aside>
+
+        <main class="flex-1 overflow-auto bg-gray-100 p-8">
+            <header class="flex items-center justify-between mb-8 bg-white p-4 rounded-lg shadow-md"
+                data-aos="fade-down" data-aos-delay="400">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xl font-semibold text-gray-700">Deteksi Gangguan Tidur</span>
+                </div>
+                <button id="darkModeToggle"
+                    class="p-2 rounded-full text-gray-600 hover:text-blue-400 transition-colors duration-200">
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        style="fill: rgba(0, 0, 0, 1); transform: ; msFilter:;">
+                        <path
+                            d="M12 2c-2.42 0-4.68.98-6.36 2.64C4.36 5.68 3.6 7.84 3.6 10.2c0 2.36.76 4.52 2.04 6.2s2.94 2.8 5.04 3.56c.1.04.2-.04.2-.16V2.16c0-.12-.1-.2-.2-.16A9.95 9.95 0 0 0 12 2zM6 10.2c0-2.2 1.34-4.14 3.32-5.06l-.01.01C8.28 4.6 7.42 5.04 6.64 5.7c-1.28 1.06-2.12 2.6-2.12 4.5 0 1.9.84 3.44 2.12 4.5.78.66 1.64 1.1 2.32 1.4L9.31 15.26C7.34 14.34 6 12.4 6 10.2z">
+                        </path>
+                    </svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        style="fill: rgba(0, 0, 0, 1); transform: ; msFilter:;">
+                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18V4a8 8 0 0 1 0 16z"></path>
+                    </svg>
+                </button>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <section class="md:col-span-2 bg-white p-6 rounded-lg shadow-md" data-aos="fade-up"
+                    data-aos-delay="500">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Prediksi Gangguan Tidur</h2>
+
+                    <form id="predictionForm" class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                        <div data-aos="fade-up" data-aos-delay="600">
+                            <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                            <input type="number" id="age" name="Age" min="1" max="100" class="input-field w-full"
+                                required>
+                        </div>
+                        <div data-aos="fade-up" data-aos-delay="650">
+                            <label for="sleepDuration" class="block text-sm font-medium text-gray-700 mb-1">Sleep
+                                Duration (hours)</label>
+                            <input type="number" id="sleepDuration" name="Sleep Duration" step="0.1" min="0" max="24"
+                                class="input-field w-full" required>
+                        </div>
+                        <div data-aos="fade-up" data-aos-delay="700">
+                            <label for="qualityOfSleep" class="block text-sm font-medium text-gray-700 mb-1">Quality
+                                of
+                                Sleep (1-10)</label>
+                            <input type="number" id="qualityOfSleep" name="Quality of Sleep" min="1" max="10"
+                                class="input-field w-full" required>
+                        </div>
+                        <div data-aos="fade-up" data-aos-delay="750">
+                            <label for="physicalActivityLevel"
+                                class="block text-sm font-medium text-gray-700 mb-1">Physical Activity Level</label>
+                            <input type="number" id="physicalActivityLevel" name="Physical Activity Level" min="0"
+                                class="input-field w-full" required>
+                        </div>
+                        <div data-aos="fade-up" data-aos-delay="800">
+                            <label for="stressLevel" class="block text-sm font-medium text-gray-700 mb-1">Stress Level
+                                (1-10)</label>
+                            <input type="number" id="stressLevel" name="Stress Level" min="1" max="10"
+                                class="input-field w-full" required>
+                        </div>
+                        <div data-aos="fade-up" data-aos-delay="850">
+                            <label for="heartRate" class="block text-sm font-medium text-gray-700 mb-1">Heart Rate
+                                (bpm)</label>
+                            <input type="number" id="heartRate" name="Heart Rate" min="30" max="200"
+                                class="input-field w-full" required>
+                        </div>
+                        <div data-aos="fade-up" data-aos-delay="900">
+                            <label for="dailySteps" class="block text-sm font-medium text-gray-700 mb-1">Daily
+                                Steps</label>
+                            <input type="number" id="dailySteps" name="Daily Steps" min="0" class="input-field w-full"
+                                required>
+                        </div>
+                        <div data-aos="fade-up" data-aos-delay="950">
+                            <label for="systolicBP" class="block text-sm font-medium text-gray-700 mb-1">Systolic
+                                BP</label>
+                            <input type="number" id="systolicBP" name="Systolic_BP" min="70" max="200"
+                                class="input-field w-full" required>
+                        </div>
+                        <div data-aos="fade-up" data-aos-delay="1000">
+                            <label for="diastolicBP" class="block text-sm font-medium text-gray-700 mb-1">Diastolic
+                                BP</label>
+                            <input type="number" id="diastolicBP" name="Diastolic_BP" min="40" max="150"
+                                class="input-field w-full" required>
+                        </div>
+
+                        <div class="select-wrapper" data-aos="fade-up" data-aos-delay="1050">
+                            <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                            <select id="gender" name="Gender" class="input-field w-full select-field" required>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+
+                        <div class="select-wrapper" data-aos="fade-up" data-aos-delay="1100">
+                            <label for="occupation"
+                                class="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
+                            <select id="occupation" name="Occupation" class="input-field w-full select-field" required>
+                                <option value="">Select Occupation</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Engineer">Engineer</option>
+                                <option value="Lawyer">Lawyer</option>
+                                <option value="Nurse">Nurse</option>
+                                <option value="Sales Representative">Sales Representative</option>
+                                <option value="Salesperson">Salesperson</option>
+                                <option value="Scientist">Scientist</option>
+                                <option value="Software Engineer">Software Engineer</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Accountant">Accountant</option>
+                                <option value="Manager">Manager</option>
+                            </select>
+                        </div>
+
+                        <div class="select-wrapper" data-aos="fade-up" data-aos-delay="1150">
+                            <label for="bmiCategory" class="block text-sm font-medium text-gray-700 mb-1">BMI
+                                Category</label>
+                            <select id="bmiCategory" name="BMI Category" class="input-field w-full select-field"
+                                required>
+                                <option value="">Select BMI Category</option>
+                                <option value="Normal Weight">Normal Weight</option>
+                                <option value="Overweight">Overweight</option>
+                                <option value="Obese">Obese</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2 mt-4" data-aos="fade-up" data-aos-delay="1200">
+                            <button type="submit"
+                                class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="predictionResult"
+                        class="mt-8 p-4 bg-gray-100 rounded-lg text-center text-xl font-bold text-gray-800 hidden"
+                        data-aos="zoom-in" data-aos-delay="1300">
+                    </div>
+                    <div id="errorMessage" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg hidden" data-aos="zoom-in"
+                        data-aos-delay="1300">
+                    </div>
+                </section>
+
+                <section class="md:col-span-1 bg-white p-6 rounded-lg shadow-md" data-aos="fade-left"
+                    data-aos-delay="500">
+
+                    <div class="p-4 bg-gray-100 rounded-lg mb-4 text-center" data-aos="fade-in" data-aos-delay="600">
+                        <p id="currentDate" class="text-blue-600 text-2xl font-bold"></p>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-6" data-aos="fade-in" data-aos-delay="700">
+                        <h2 class="text-xl font-semibold text-gray-800">Artikel</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <a href="https://www.halodoc.com/kesehatan/insomnia?srsltid=AfmBOoop5Y9SwC2dwHV_iSbgi-Wh6Iiw2HUNWkaPNSwuyHlLqV_SXe7U" target="_blank"
+                            class="article-link" data-aos="fade-left" data-aos-delay="800">
+                            <div>
+                                <p class="font-semibold text-gray-800">Apa itu Insomnia</p>
+                                <p class="text-sm text-gray-500">https://www.halodoc.com/kesehatan/insomnia?...</p>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                style="fill: rgba(0, 0, 0, 1); transform: ; msFilter:;">
+                                <path
+                                    d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <div class="space-y-4 mt-5">
+                        <a href="https://www.alodokter.com/sleep-apnea" target="_blank"
+                            class="article-link" data-aos="fade-left" data-aos-delay="900">
+                            <div>
+                                <p class="font-semibold text-gray-800">Apa itu Apnea</p>
+                                <p class="text-sm text-gray-500">https://www.alodokter.com/sleep-apnea...</p>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                style="fill: rgba(0, 0, 0, 1); transform: ; msFilter:;">
+                                <path
+                                    d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z">
+                                </path>
+                            </svg>
+                        </a>
+                    </div>
+
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+
+        document.getElementById('predictionForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const predictionResultDiv = document.getElementById('predictionResult');
+            const errorMessageDiv = document.getElementById('errorMessage');
+            predictionResultDiv.classList.add('hidden');
+            errorMessageDiv.classList.add('hidden');
+            errorMessageDiv.textContent = ''; // Clear previous error
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = {};
+
+            // Collect numerical inputs
+            ['Age', 'Sleep Duration', 'Quality of Sleep', 'Physical Activity Level',
+                'Stress Level', 'Heart Rate', 'Daily Steps', 'Systolic_BP', 'Diastolic_BP'].forEach(key => {
+                    data[key] = parseFloat(formData.get(key));
+                });
+
+            // Handle categorical inputs with One-Hot Encoding logic
+            // Initialize all dummy variables to 0
+            const occupationList = ["Doctor", "Engineer", "Lawyer", "Nurse", "Sales Representative", "Salesperson", "Scientist", "Software Engineer", "Teacher", "Accountant", "Manager"];
+            const bmiCategoryList = ["Normal Weight", "Obese", "Overweight"];
+
+            data['Gender_Male'] = (formData.get('Gender') === 'Male') ? 1 : 0;
+
+            occupationList.forEach(occ => {
+                data[`Occupation_${occ}`] = 0;
+            });
+            const selectedOccupation = formData.get('Occupation');
+            if (selectedOccupation) {
+                data[`Occupation_${selectedOccupation}`] = 1;
+            }
+
+            bmiCategoryList.forEach(bmi => {
+                data[`BMI Category_${bmi}`] = 0;
+            });
+            const selectedBmiCategory = formData.get('BMI Category');
+            if (selectedBmiCategory) {
+                data[`BMI Category_${selectedBmiCategory}`] = 1;
+            }
+
+            console.log("Sending data:", data); // Log the data being sent
+
+            try {
+                // Replace with your Flask API endpoint
+                const response = await fetch('https://7dssb7mg-5000.asse.devtunnels.ms/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                predictionResultDiv.textContent = `Prediction: ${result.prediction}`;
+                predictionResultDiv.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Prediction failed:', error);
+                errorMessageDiv.textContent = `Error: ${error.message}. Please check your input and ensure the Flask API is running.`;
+                errorMessageDiv.classList.remove('hidden');
+            }
+        });
+
+        // Dark Mode Logic
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        const sunIcon = document.querySelector('.sun-icon');
+        const moonIcon = document.querySelector('.moon-icon');
+
+        // Function to set theme
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('dark');
+                if (sunIcon) sunIcon.style.display = 'none';
+                if (moonIcon) moonIcon.style.display = 'block';
+            } else {
+                body.classList.remove('dark');
+                if (sunIcon) sunIcon.style.display = 'block';
+                if (moonIcon) moonIcon.style.display = 'none';
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        // Check for saved theme in localStorage on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            // Default to light mode if no preference is saved
+            setTheme('light');
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            if (body.classList.contains('dark')) {
+                setTheme('light');
+            } else {
+                setTheme('dark');
+            }
+        });
+
+        // **NEW: Dynamic Date Logic**
+        function updateCurrentDate() {
+            const dateElement = document.getElementById('currentDate');
+            const now = new Date();
+            const options = { weekday: 'short', day: 'numeric', month: 'short' };
+            dateElement.textContent = now.toLocaleDateString('en-US', options); // e.g., "Fri, 24 Mar"
+        }
+
+        // Call the function to set the date on page load
+        updateCurrentDate();
+    </script>
+</body>
+
+</html>

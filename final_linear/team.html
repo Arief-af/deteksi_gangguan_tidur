@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team - Sleep Disorder Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        /* Custom scrollbar for better aesthetics, matching the dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2D3748;
+            /* bg-gray-800 */
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4A5568;
+            /* bg-gray-600 */
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280;
+            /* bg-gray-500 */
+        }
+
+        /* Dark Mode Styles */
+        body.dark {
+            background-color: #1a202c;
+            /* Tailwind's gray-900 */
+            color: #e2e8f0;
+            /* Tailwind's gray-200 */
+        }
+
+        body.dark .bg-gray-100 {
+            background-color: #1a202c;
+        }
+
+        body.dark .bg-white {
+            background-color: #2d3748;
+            /* Tailwind's gray-800 */
+            /* Removed border-color */
+        }
+
+        body.dark .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark .text-gray-900 {
+            color: #e2e8f0;
+        }
+
+        body.dark .text-gray-800 {
+            color: #e2e8f0;
+        }
+
+        body.dark .text-gray-700 {
+            color: #cbd5e0;
+            /* Tailwind's gray-300 */
+        }
+
+        body.dark .text-gray-600 {
+            color: #a0aec0;
+            /* Tailwind's gray-400 */
+        }
+
+        body.dark .text-gray-500 {
+            color: #718096;
+            /* Tailwind's gray-500 */
+        }
+
+        body.dark .bg-gray-50 {
+            background-color: #3b475c;
+        }
+
+        body.dark .bg-blue-600 {
+            background-color: #3182ce;
+            /* A slightly lighter blue for dark mode */
+        }
+
+        body.dark .bg-blue-700:hover {
+            background-color: #2b6cb0;
+        }
+
+        body.dark .active.bg-blue-600 {
+            background-color: #2c5282;
+        }
+
+        /* SVG fill color for dark mode */
+        body.dark svg {
+            fill: #e2e8f0 !important;
+            /* Forces SVG fill to white in dark mode */
+        }
+
+        /* Dark mode toggle animation */
+        #darkModeToggle svg {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        body.dark #darkModeToggle .sun-icon {
+            display: none;
+        }
+
+        body:not(.dark) #darkModeToggle .moon-icon {
+            display: none;
+        }
+
+        /* Sidebar Icons */
+        .sidebar-icon {
+            @apply flex items-center justify-center w-12 h-12 rounded-lg transition-colors duration-200;
+        }
+
+        .sidebar-icon.active svg {
+            fill: white !important;
+            /* Added !important */
+        }
+
+        .sidebar-icon:hover {
+            @apply bg-blue-700;
+        }
+
+        .sidebar-icon.active {
+            background-color: #2c5282 !important;
+        }
+
+        /* Team Member Card Styles */
+        .team-card {
+            @apply bg-white p-6 rounded-lg shadow-md text-center;
+            min-height: 150px;
+            /* Adjust as needed */
+        }
+
+        body.dark .team-card {
+            background-color: #3b475c;
+            /* Dark mode card background */
+        }
+
+        /* Style for the images */
+        .metrics-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            /* Spacing between the text and image */
+            cursor: zoom-in;
+            /* Indicate that it's clickable for zoom */
+        }
+
+        body.dark .metrics-image {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* === Popup Styles === */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            /* Dark semi-transparent background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            /* Ensure it's on top of everything */
+            opacity: 0;
+            /* Hidden by default */
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            position: relative;
+            max-width: 90%;
+            /* Max width for the image */
+            max-height: 90%;
+            /* Max height for the image */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            /* Ensure image fits within bounds */
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 5px;
+            z-index: 1001;
+            /* Ensure close button is above image */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 font-sans antialiased text-gray-900">
+
+    <div class="flex h-screen bg-gray-100">
+        <aside class="w-20 bg-white shadow-lg flex flex-col items-center py-6 z-10">
+            <div class="mb-10" data-aos="fade-down">
+                <span class="font-bold text-2xl text-blue-600">I</span>
+            </div>
+            <nav class="flex flex-col gap-5">
+                <a href="index.html" class="shadow-lg p-3 rounded-full sidebar-icon text-gray-600 hover:text-blue-400"
+                    data-aos="fade-right" data-aos-delay="100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                        <path
+                            d="M19.649 5.286 14 8.548V2.025h-4v6.523L4.351 5.286l-2 3.465 5.648 3.261-5.648 3.261 2 3.465L10 15.477V22h4v-6.523l5.649 3.261 2-3.465-5.648-3.261 5.648-3.261z">
+                        </path>
+                    </svg>
+                </a>
+                <a href="team.html"
+                    class="shadow-lg p-3 active rounded-full sidebar-icon text-gray-600 hover:text-blue-400"
+                    data-aos="fade-right" data-aos-delay="200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                        <path
+                            d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z">
+                        </path>
+                        <path d="M11 11h2v6h-2zm0-4h2v2h-2z"></path>
+                    </svg>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 overflow-auto bg-gray-100 p-8">
+            <header class="flex items-center justify-between mb-8 bg-white p-4 rounded-lg shadow-md"
+                data-aos="fade-down" data-aos-delay="400">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xl font-semibold text-gray-700">Deteksi Gangguan Tidur</span>
+                </div>
+                <button id="darkModeToggle"
+                    class="p-2 rounded-full text-gray-600 hover:text-blue-400 transition-colors duration-200">
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        style="fill: rgba(0, 0, 0, 1); transform: ; msFilter:;">
+                        <path
+                            d="M12 2c-2.42 0-4.68.98-6.36 2.64C4.36 5.68 3.6 7.84 3.6 10.2c0 2.36.76 4.52 2.04 6.2s2.94 2.8 5.04 3.56c.1.04.2-.04.2-.16V2.16c0-.12-.1-.2-.2-.16A9.95 9.95 0 0 0 12 2zM6 10.2c0-2.2 1.34-4.14 3.32-5.06l-.01.01C8.28 4.6 7.42 5.04 6.64 5.7c-1.28 1.06-2.12 2.6-2.12 4.5 0 1.9.84 3.44 2.12 4.5.78.66 1.64 1.1 2.32 1.4L9.31 15.26C7.34 14.34 6 12.4 6 10.2z">
+                        </path>
+                    </svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        style="fill: rgba(0, 0, 0, 1); transform: ; msFilter:;">
+                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18V4a8 8 0 0 1 0 16z"></path>
+                    </svg>
+                </button>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <section class="md:col-span-2 bg-white p-6 rounded-lg shadow-md" data-aos="fade-up"
+                    data-aos-delay="500">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Our Team</h2>
+
+                    <div class="flex justify-center gap-6 mb-10">
+                        <div class="team-card w-full bg-gray-50 flex items-center flex-col justify-center"
+                            data-aos="zoom-in" data-aos-delay="600">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Arief Akhmad Fauzi</h3>
+                            <p class="text-gray-600">15-2022-262</p>
+                        </div>
+
+                        <div class="team-card w-full bg-gray-50 flex items-center flex-col justify-center"
+                            data-aos="zoom-in" data-aos-delay="700">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Rakha Dwi Pradifa</h3>
+                            <p class="text-gray-600">15-2022-223</p>
+                        </div>
+                    </div>
+
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 mt-10">Model Performance Metrics</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-50 p-6 rounded-lg shadow-md flex flex-col items-center justify-center text-center"
+                            data-aos="zoom-in" data-aos-delay="800">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Summary Metrics</h3>
+                            <img id="summaryMetricsPlot" src="https://7dssb7mg-5000.asse.devtunnels.ms/metrics/summary_plot"
+                                alt="Model Summary Metrics Bar Chart" class="metrics-image">
+                            <p class="text-sm text-gray-600 mt-2">Overall Accuracy, Precision, Recall, and F1-Score.</p>
+                        </div>
+
+                        <div class="bg-gray-50 p-6 rounded-lg shadow-md flex flex-col items-center justify-center text-center"
+                            data-aos="zoom-in" data-aos-delay="900">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-4">Full Classification Report Heatmap</h3>
+                            <img id="fullReportPlot" src="https://7dssb7mg-5000.asse.devtunnels.ms/metrics/full_report_plot"
+                                alt="Full Classification Report Heatmap" class="metrics-image">
+                            <p class="text-sm text-gray-600 mt-2">Detailed metrics (Precision, Recall, F1-Score,
+                                Support) per class.</p>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="md:col-span-1 bg-white p-6 rounded-lg shadow-md" data-aos="fade-left"
+                    data-aos-delay="500">
+                    <div class="p-4 bg-gray-100 rounded-lg mb-4 text-center" data-aos="fade-in" data-aos-delay="600">
+                        <p id="currentDate" class="text-blue-600 text-2xl font-bold"></p>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-6" data-aos="fade-in" data-aos-delay="700">
+                        <h2 class="text-xl font-semibold text-gray-800">Informasi Proyek</h2>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3 p-5 bg-gray-50 rounded-lg" data-aos="fade-left"
+                            data-aos-delay="800">
+                            <div>
+                                <p class="font-semibold text-gray-800">Prediksi Gangguan Tidur</p>
+                                <p class="text-sm">
+                                    Proyek ini bertujuan untuk mendeteksi gangguan tidur (Apnea dan Insomnia)
+                                    menggunakan metode Machine Learning (Logistic Regression)
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3 p-5 bg-gray-50 rounded-lg" data-aos="fade-left"
+                            data-aos-delay="800">
+                            <div>
+                                <p class="font-semibold text-gray-800">Sumber Dataset</p>
+                                <p class="text-sm">
+                                    https://www.kaggle.com/datasets/uom190346a/sleep-health-and-lifestyle-dataset
+
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <div id="imagePopup" class="popup-overlay">
+        <div class="popup-content">
+            <button id="closePopup" class="popup-close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"
+                    style="fill: rgba(255, 255, 255, 1);">
+                    <path
+                        d="m16.192 6.344-4.192 4.192-4.192-4.192-1.414 1.414L10.586 12l-4.192 4.192 1.414 1.414L12 13.414l4.192 4.192 1.414-1.414L13.414 12l4.192-4.192z">
+                    </path>
+                </svg>
+            </button>
+            <img id="zoomedImage" src="" alt="Zoomed Image">
+        </div>
+    </div>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+
+        // Dark Mode Logic (Reused from previous page)
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        const sunIcon = document.querySelector('.sun-icon');
+        const moonIcon = document.querySelector('.moon-icon');
+
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('dark');
+                if (sunIcon) sunIcon.style.display = 'none';
+                if (moonIcon) moonIcon.style.display = 'block';
+            } else {
+                body.classList.remove('dark');
+                if (sunIcon) sunIcon.style.display = 'block';
+                if (moonIcon) moonIcon.style.display = 'none';
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            setTheme('light'); // Default to light mode
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            if (body.classList.contains('dark')) {
+                setTheme('light');
+            } else {
+                setTheme('dark');
+            }
+        });
+
+        function updateCurrentDate() {
+            const dateElement = document.getElementById('currentDate');
+            const now = new Date();
+            const options = { weekday: 'short', day: 'numeric', month: 'short' };
+            dateElement.textContent = now.toLocaleDateString('en-US', options); // e.g., "Fri, 24 Mar"
+        }
+
+        // Call the function to set the date on page load
+        updateCurrentDate();
+
+
+        // === Popup Zoom Logic ===
+        const summaryMetricsPlot = document.getElementById('summaryMetricsPlot');
+        const fullReportPlot = document.getElementById('fullReportPlot');
+        const future_importances = document.getElementById('future_importances');
+        const imagePopup = document.getElementById('imagePopup');
+        const zoomedImage = document.getElementById('zoomedImage');
+        const closePopup = document.getElementById('closePopup');
+
+        function openPopup(imageSrc) {
+            zoomedImage.src = imageSrc;
+            imagePopup.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling when popup is open
+        }
+
+        function closePopupHandler() {
+            imagePopup.classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
+            // Optional: clear the image src after transition to save memory/prevent flicker
+            setTimeout(() => { zoomedImage.src = ''; }, 300);
+        }
+
+        // Add click listeners to your images
+        if (summaryMetricsPlot) {
+            summaryMetricsPlot.addEventListener('click', () => {
+                openPopup(summaryMetricsPlot.src);
+            });
+        }
+
+        if (fullReportPlot) {
+            fullReportPlot.addEventListener('click', () => {
+                openPopup(fullReportPlot.src);
+            });
+        }
+
+        if (future_importances) {
+            future_importances.addEventListener('click', () => {
+                openPopup(future_importances.src);
+            });
+        }
+
+        // Add click listener to close button
+        if (closePopup) {
+            closePopup.addEventListener('click', closePopupHandler);
+        }
+
+        // Close popup if clicking on the overlay itself (but not the image inside)
+        if (imagePopup) {
+            imagePopup.addEventListener('click', (event) => {
+                if (event.target === imagePopup) { // Only close if clicking the background, not the image
+                    closePopupHandler();
+                }
+            });
+        }
+
+        // Close popup on Escape key press
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && imagePopup.classList.contains('show')) {
+                closePopupHandler();
+            }
+        });
+        // === End Popup Zoom Logic ===
+
+    </script>
+</body>
+
+</html>
