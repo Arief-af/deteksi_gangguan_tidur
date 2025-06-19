@@ -23,7 +23,7 @@ except FileNotFoundError:
 
 @app.route('/')
 def home():
-    return "API Prediksi Gangguan Tidur. Gunakan endpoint /predict untuk prediksi."
+    return "API Klasifikasi Gangguan Tidur. Gunakan endpoint /predict untuk prediksi."
 
 @app.route('/predict', methods=['POST'])
 def predict():
